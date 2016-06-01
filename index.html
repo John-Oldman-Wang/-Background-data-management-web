@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>用户管理</title>
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://datatables.club/upgrade/datatables/dataTables.bootstrap.css" rel="stylesheet">
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<link  href="css/select2.min.css" type="text/css" rel="stylesheet"  />
+<link  href="css/daterangepicker.css" type="text/css" rel="stylesheet"  />
+<script type="text/javascript" src='js/select2.full.js'></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/moment.js"></script>
+<script type="text/javascript" src="js/daterangepicker.js"></script>
+<style type="text/css">
+.header{position:relative; width:1000px;}
+.usertype{width:300px; margin-left:30px; margin-top:20px;}
+.time-box{width:600px;position:absolute; left:300px; top:0px;}
+.time-box i{position: absolute; bottom: 10px; right: 24px; top: auto; cursor: pointer;}
+.btn-box{position:absolute;left:1100px; top:30px; }
+.showbody{width:1200px; position:absolute;top:120px; left:30px;}
+td{cursor: pointer;}
+</style>
+</head>
+
+<body>
+<div class="header">
+  <div class="usertype">
+  <label>账号类型:</label>
+  <select class="js-states form-control type-list" id="usertype">
+    <option value="type1">类型1</option>
+    <option value="type2">类型2</option>
+    <option value="type3">类型3</option>
+    <option value="type4">类型4</option>
+    <option value="type5">类型5</option>
+    <option value="type6">类型6</option>
+    <option value="type7">类型7</option>
+    <option value="type8">类型8</option>
+  </select>
+  </div>
+  <div class="time-box col-md-4 col-md-offset-2">
+  <label for="congig-demo">注册时段</label>
+  <input type="text" class="form-control" id="config-demo" />
+  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+  </div>
+  <div class="btn-box">
+  <input type="button" value="查找" id="search" />
+  </div>
+</div>
+
+<div class="showbody">
+<table class="table table-bordered dataTable">
+  <thead>
+  <tr>
+  <th>编码</th>
+  <th>名称</th>
+  <th>备注</th>
+  <th>状态</th>
+  <th>创建时间</th>
+  <th>最近登陆时间</th>
+  <th>账号类型</th>
+  <th>操作</th>
+  <tr>
+  </thead>
+  <tbody id="showlist">
+  <tr>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td><input class="state" name="state" type="radio" value="在线"/>在线<input name="state" type="radio" value="离线"/>离线</td>
+    <td>5</td>
+    <td>6</td>
+    <td>7</td>
+    <td><a class="edit" href="#">编辑</a>|<a class="done" href="#">Done</a>|<a class="delete" href="#">删除</a></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>4</td>
+    <td>5</td>
+    <td>6</td>
+    <td>7</td>
+    <td><a class="edit" href="#">编辑</a>|<a class="done" href="#">Done</a>|<a class="delete" href="#">删除</a></td>
+  </tr>
+  </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+      $('.time i').click(function() {
+          $(this).parent().find('input').click();
+        });
+		$('#config-demo').daterangepicker({}, function(start, end, label) {console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+		});
+		$(".state:eq(0)").attr("checked","checked");
+</script>
+<script src="http://www.zhuhaihengxin.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://www.zhuhaihengxin.com/libs/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script>
+	var typelist='';
+	$.ajax({
+		type:"POST",
+		url:"usertype.php",
+		dataType:"json",
+		success:function(data){
+			$("#usertype").html('');
+			alert("更新用户类型：");
+		for(var i=0;i<data.type.length;i++){
+			alert("用户类型有："+data.type[i]);
+			typelist=typelist+"<option value='type"+(i+1)+"'>"+data.type[i]+"</option>"
+		}
+		$("#usertype").html(typelist);
+		},
+		error: function(jqXHR){
+		alert("加载用户类型出错"+jqXHR.status);
+		}
+	});
+	$("#search").click(function(){
+		$.ajax({
+			type:"POST",
+			url:"search.php",
+			dataType:"json",
+			data:{
+			type:$("#usertype").val(),
+			timerange:$("#config-demo").val()
+			},
+			success:function(data){
+				var tablelist='';
+				for(var i=0;i<data.name.length;i++)
+				{
+					tablelist=tablelist+"<tr><td>"+data.id[i]+"</td><td>"+data.name[i]+"</td><td>"+data.remark[i]+"</td><td>"+data.status[i]+"</td><td>"+data.createtime[i]+"</td><td>"+data.logintime[i]+"</td><td>"+data.type[i]+"</td><td><a class='edit' href='#'>编辑</a>|<a class='done' href='#'>Done</a>|<a class='delete' href='#'>删除</a></td></tr>";
+				}
+				$("#showlist").html(tablelist);
+			},
+			error: function(jqXHR){
+				alert("查找用户类型出错"+jqXHR.status);
+			}
+		})
+	});
+
+</script>
+</body>
+</html>
