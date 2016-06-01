@@ -1,5 +1,23 @@
 <?php
 header("Content-Type:applocation/json;charset=utf-8");
-echo '{"success":true,"id": ["101","102","103"],"name":["jack","tony","sundy"],"remark":["taobao11","jd11","other"],"status":["在线","不在线","在线"],"createtime":["2012111","20131212","20161220"],"logintime":["20160530","20160520","20160601"],"type": ["淘宝用户","京东用户","非网店用户"]}';
+
+$type="taobao";
+$link=mysqli_connect('localhost','root','admin');
+mysqli_select_db($link,'nokisnojok');
+$sql="select * from user where type='$type'";
+$result=mysqli_query($link,$sql);
+$row=mysqli_fetch_array($result,MYSQL_ASSOC);
+$row=mysqli_fetch_array($result,MYSQL_ASSOC);
+
+echo '{
+	"success": true,
+	"id": '.$row['id'].',
+	"name":"'.$row['name'].'",
+	"remark": "'.$row['remark'].'", 
+	"status": "'.$row['status'].'",
+	"createtime": "'.$row['createtime'].'",
+	"logintime": "'.$row['logintime'].'",
+	"type": "'.$row['type'].'"
+}';
 
 ?>
