@@ -4,8 +4,6 @@
 <title>用户管理</title>
 <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
 <link href="http://datatables.club/upgrade/datatables/dataTables.bootstrap.css" rel="stylesheet">
-
-<script type="text/javascript" src="js/jquery.min.js"></script>
 <link  href="css/select2.min.css" type="text/css" rel="stylesheet"  />
 <link  href="css/daterangepicker.css" type="text/css" rel="stylesheet"  />
 <script type="text/javascript" src='js/select2.full.js'></script>
@@ -65,24 +63,10 @@ td{cursor: pointer;}
   </thead>
   <tbody id="showlist">
   <tr>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td><input class="state" name="state" type="radio" value="在线"/>在线<input name="state" type="radio" value="离线"/>离线</td>
-    <td>5</td>
-    <td>6</td>
-    <td>7</td>
-    <td><a class="edit" href="#">编辑</a>|<a class="done" href="#">Done</a>|<a class="delete" href="#">删除</a></td>
+    
   </tr>
   <tr>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td><input class="state" name="state" type="radio" value="在线"/>在线<input name="state" type="radio" value="离线"/>离线</td>
-    <td>5</td>
-    <td>6</td>
-    <td>7</td>
-    <td><a class="edit" href="#">编辑</a>|<a class="done" href="#">Done</a>|<a class="delete" href="#">删除</a></td>
+    
   </tr>
   </tbody>
   </table>
@@ -127,8 +111,9 @@ td{cursor: pointer;}
 			timerange:$("#config-demo").val()
 			},
 			success:function(data){
+				alert(data.success);
 				var tablelist='';
-				if(i<data.id.length){
+				if(data.id.length){
 				for(var i=0;i<data.id.length;i++)
 				{
 					tablelist=tablelist+"<tr><td>"+data.id[i]+"</td><td>"+data.name[i]+"</td><td>"+data.remark[i]+"</td><td>"+data.status[i]+"</td><td>"+data.createtime[i]+"</td><td>"+data.logintime[i]+"</td><td>"+data.type[i]+"</td><td><a class='edit' href='#'>编辑</a>|<a class='done' href='#'>Done</a>|<a class='delete' href='#'>删除</a></td></tr>";
@@ -137,6 +122,35 @@ td{cursor: pointer;}
 					tablelist=tablelist+"<tr><td>"+data.id+"</td><td>"+data.name+"</td><td>"+data.remark+"</td><td>"+data.status+"</td><td>"+data.createtime+"</td><td>"+data.logintime+"</td><td>"+data.type+"</td><td><a class='edit' href='#'>编辑</a>|<a class='done' href='#'>Done</a>|<a class='delete' href='#'>删除</a></td></tr>";
 				}
 				$("#showlist").html(tablelist);
+				$("#showlist a:contains('删除')").click(function(){
+					$this=$(this);
+					alert($this.parent().parent().find('td').eq(0).html());
+					$.ajax({
+						type:"POST",
+						url:"delete.php",
+						dataType:"json",
+						data:{
+							id:$(this).parent().parent().find('td').eq(0).html()
+						},
+					    success:function(){
+						   alert("删除成功");
+						   $this.parent().parent().remove();
+					    },
+					    error:function(jqXHR){
+						  alert("无法删除"+jqXHR.status);
+					    }
+			        });
+				});
+				$("#showlist a:contains('编辑')").click(function(){
+					$this=$(this);
+					$this.parent().parent().find('td').eq(1).html("<input type='text' class='form-control' value='"+$this.parent().parent().find('td').eq(1).html()+"'/input>");
+					$this.parent().parent().find('td').eq(2).html("<input type='text' class='form-control' value='"+$this.parent().parent().find('td').eq(2).html()+"'/input>");
+					$this.parent().parent().find('td').eq(3).html("<select class='js-states form-control type-list' id='editremark'><option value='online'>online</option><option value='type2'>offline</option></select>");
+					$this.parent().parent().find('td').eq(6).html("<select class='js-states form-control type-list' id='edittype'>"+$("#usertype").html()+"</select>")
+					$this.parent().parent().find('td').eq(7).html("<a>保存</a>|<a>取消</a>");
+					});
+					
+					
 			},
 			error: function(jqXHR){
 				alert("查找用户类型出错"+jqXHR.status);
